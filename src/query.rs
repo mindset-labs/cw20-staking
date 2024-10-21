@@ -1,7 +1,10 @@
 use cosmwasm_std::{Addr, Deps, Env, StdResult, Uint128};
 use cw20_base::state::BALANCES;
 
-use crate::{msg::{AvailableBalanceResponse, RewardResponse, StakedBalanceResponse}, state::{StakedBalance, LOCKED_BALANCES, STAKED_BALANCES, STAKING_CONFIGS}};
+use crate::{
+    msg::{AvailableBalanceResponse, RewardResponse, StakedBalanceResponse}, 
+    state::{StakedBalance, LOCKED_BALANCES, STAKED_BALANCES, STAKING_CONFIGS}
+};
 
 pub fn query_staked_balance(deps: &Deps, _env: &Env, address: Addr) -> StdResult<StakedBalanceResponse> {
     let staked_balance = STAKED_BALANCES.may_load(deps.storage, &address)?.unwrap_or_default();

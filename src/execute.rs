@@ -1,8 +1,7 @@
-use cosmwasm_std::{attr, DepsMut, Env, MessageInfo, Response, StdResult, Storage, Uint128};
+use cosmwasm_std::{attr, DepsMut, Env, MessageInfo, Response, Uint128};
 use cw20_base::{contract::execute_mint, state::BALANCES};
 
 use crate::{query::query_reward, state::{StakedBalance, STAKED_BALANCES}, ContractError};
-
 
 pub fn execute_stake(deps: DepsMut, env: Env, info: MessageInfo, amount: Uint128) -> Result<Response, ContractError> {
     BALANCES.update(deps.storage, &info.sender, |balance| -> Result<Uint128, ContractError> {
