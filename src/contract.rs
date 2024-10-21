@@ -140,8 +140,9 @@ mod tests {
     use cosmwasm_std::{coin, coins, from_json, Addr, Uint128};
     use cw20::Cw20Coin;
     use cw20_base::state::TokenInfo;
-    use cw_multi_test::{App, Contract, ContractWrapper, Executor};
+    use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
     use crate::msg::{AvailableBalanceResponse, ExecuteMsg, InstantiateMsg, QueryMsg, RewardResponse, StakedBalanceResponse};
+    use crate::ContractError;
 
     fn mock_app() -> App {
         App::new(|router, _api, storage| {
@@ -311,6 +312,35 @@ mod tests {
             .unwrap();
 
         assert_eq!(staked_balance.balance, Uint128::new(100_000));
+    }
+
+    #[test]
+    fn test_stake_locks_balance() {
+        let (mut app, addr) = do_instantiate(None, None);
+        let owner = app.api().addr_make(&"owner".to_string());
+
+        // Stake tokens
+        let stake_msg = ExecuteMsg::Stake {
+            amount: Uint128::new(100_000),
+        };
+
+        app.execute_contract(owner.clone(), addr.clone(), &stake_msg, &[])
+            .unwrap();
+
+        let transfer_msg = ExecuteMsg::Transfer {
+            recipient: owner.to_string(),
+            amount: Uint128::new(1_000_000),
+        };
+
+        let result = app.execute_contract(
+            owner.clone(), addr.clone(), &transfer_msg, &[]
+        );
+
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().root_cause().to_string(),
+            ContractError::InsufficientFunds { available: Uint128::new(900_000) }.to_string()
+        );
     }
 
     #[test]
