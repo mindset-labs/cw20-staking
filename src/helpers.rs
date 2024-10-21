@@ -32,9 +32,9 @@ pub fn check_available_balance(
     sender: &Addr,
     amount: Uint128,
 ) -> Result<(), ContractError> {
-    let available_balance = query_available_balance(deps.as_ref(), env.clone(), sender.clone())?;
-    if amount > available_balance {
-        return Err(ContractError::InsufficientFunds { available: available_balance });
+    let available_balance = query_available_balance(&deps.as_ref(), env, sender.clone())?;
+    if amount > available_balance.balance {
+        return Err(ContractError::InsufficientFunds { available: available_balance.balance });
     }
     Ok(())
 }

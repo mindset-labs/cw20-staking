@@ -12,6 +12,9 @@ pub enum ContractError {
     #[error("Insufficient funds: available {available}")]
     InsufficientFunds { available: Uint128 },
 
+    #[error("Overflow")]
+    Overflow {},
+
     #[error("Unauthorized")]
     Unauthorized {},
     // Add any other custom errors you like here.

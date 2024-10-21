@@ -48,4 +48,4 @@ cw-utils = "2.0.0"
 cw20-base = { version = "2.0.0", features = ["library"] }
 
 [dev-dependencies]
-cw-multi-test = "2.0.0"
+cw-multi-test = "2.1.1"

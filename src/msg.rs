@@ -1,8 +1,8 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Addr, Binary, Uint128};
 use cw20::{
-    AllAccountsResponse, AllAllowancesResponse, AllowanceResponse, BalanceResponse, 
-    DownloadLogoResponse, Expiration, Logo, 
+    AllAccountsResponse, AllAllowancesResponse, AllowanceResponse, BalanceResponse,
+    Cw20Coin, DownloadLogoResponse, Expiration, Logo,
     MarketingInfoResponse, MinterResponse, TokenInfoResponse
 };
 use cw20_base::msg::InstantiateMarketingInfo;
@@ -13,8 +13,8 @@ pub struct InstantiateMsg {
     pub symbol: String,
     pub decimals: u8,
     pub initial_supply: Uint128,
+    pub initial_balances: Vec<Cw20Coin>,
     pub reward_per_block: Uint128,
-    pub owner: Addr,
     pub mint: Option<MinterResponse>,
     pub marketing: Option<InstantiateMarketingInfo>,
 }
@@ -39,7 +39,7 @@ pub enum ExecuteMsg {
     // staking
     Stake { amount: Uint128 },
     Unstake { amount: Uint128 },
-    ClaimRewards { amount: Uint128 },
+    ClaimRewards {},
     Unlock {},
 }
 
