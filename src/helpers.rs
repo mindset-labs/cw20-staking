@@ -1,9 +1,9 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{to_json_binary, Addr, CosmosMsg, StdResult, WasmMsg};
+use cosmwasm_std::{to_json_binary, Addr, CosmosMsg, DepsMut, Env, StdResult, Uint128, WasmMsg};
 
-use crate::msg::ExecuteMsg;
+use crate::{msg::ExecuteMsg, query::query_available_balance, ContractError};
 
 /// CwTemplateContract is a wrapper around Addr that provides a lot of helpers
 /// for working with this.
@@ -24,4 +24,17 @@ impl CwTemplateContract {
         }
         .into())
     }
+}
+
+pub fn check_available_balance(
+    deps: &DepsMut,
+    env: &Env,
+    sender: &Addr,
+    amount: Uint128,
+) -> Result<(), ContractError> {
+    let available_balance = query_available_balance(deps.as_ref(), env.clone(), sender.clone())?;
+    if amount > available_balance {
+        return Err(ContractError::InsufficientFunds { available: available_balance });
+    }
+    Ok(())
 }

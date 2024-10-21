@@ -1,10 +1,11 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, Uint128};
+use cosmwasm_std::{Addr, Binary, Uint128};
 use cw20::{
-    AllAccountsResponse, AllAllowancesResponse, AllowanceResponse,
-    BalanceResponse, Cw20ExecuteMsg, DownloadLogoResponse, MarketingInfoResponse, MinterResponse,
-    TokenInfoResponse,
+    AllAccountsResponse, AllAllowancesResponse, AllowanceResponse, BalanceResponse, 
+    DownloadLogoResponse, Expiration, Logo, 
+    MarketingInfoResponse, MinterResponse, TokenInfoResponse
 };
+use cw20_base::msg::InstantiateMarketingInfo;
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -14,16 +15,32 @@ pub struct InstantiateMsg {
     pub initial_supply: Uint128,
     pub reward_per_block: Uint128,
     pub owner: Addr,
+    pub mint: Option<MinterResponse>,
+    pub marketing: Option<InstantiateMarketingInfo>,
 }
 
 #[cw_serde]
 pub enum ExecuteMsg {
     // base cw20
-    Cw20ExecuteMsg(Cw20ExecuteMsg),
+    Transfer { recipient: String, amount: Uint128 },
+    Burn { amount: Uint128 },
+    Send { contract: String, amount: Uint128, msg: Binary },
+    IncreaseAllowance { spender: String, amount: Uint128, expires: Option<Expiration> },
+    DecreaseAllowance { spender: String, amount: Uint128, expires: Option<Expiration> },
+    TransferFrom { owner: String, recipient: String, amount: Uint128 },
+    BurnFrom { owner: String, amount: Uint128 },
+    SendFrom { owner: String, contract: String, amount: Uint128, msg: Binary },
+    UpdateMarketing {
+        project: Option<String>,
+        description: Option<String>,
+        marketing: Option<String>,
+    },
+    UploadLogo(Logo),
     // staking
     Stake { amount: Uint128 },
     Unstake { amount: Uint128 },
     ClaimRewards { amount: Uint128 },
+    Unlock {},
 }
 
 #[cw_serde]
@@ -58,6 +75,8 @@ pub enum QueryMsg {
     StakedBalance { address: Addr },
     #[returns(RewardResponse)]
     Reward { address: Addr },
+    #[returns(AvailableBalanceResponse)]
+    AvailableBalance { address: Addr },
 }
 
 #[cw_serde]
@@ -68,4 +87,9 @@ pub struct StakedBalanceResponse {
 #[cw_serde]
 pub struct RewardResponse {
     pub reward: Uint128,
+}
+
+#[cw_serde]
+pub struct AvailableBalanceResponse {
+    pub balance: Uint128,
 }
